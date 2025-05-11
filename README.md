@@ -29,7 +29,7 @@ BorrowIQ is a machine learning project that predicts loan default probability us
 
 ## 📁 Repository Structure
 ```
-crediq-default-predictor/
+borrowiq-default-predictor/
 ├── data/                # Scripts or instructions to get LendingClub data
 ├── notebooks/           # Jupyter notebooks for EDA and modeling
 ├── src/                 # Python scripts (preprocessing, modeling, utils)
