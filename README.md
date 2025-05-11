@@ -5,7 +5,7 @@
 **Dataset**: LendingClub Loan Data (2016–2020)
 
 ## 🚀 Project Overview
-CredIQ is a machine learning project that predicts loan default probability using consumer loan data. It combines financial domain expertise with data science techniques and delivers insights through an interactive Streamlit dashboard.
+BorrowIQ is a machine learning project that predicts loan default probability using consumer loan data. It combines financial domain expertise with data science techniques and delivers insights through an interactive Streamlit dashboard.
 
 ## 🔍 Objectives
 - Predict loan default using borrower features
