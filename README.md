@@ -1,6 +1,6 @@
 # BorrowIQ: Loan Default Predictor
 
-**Author**: Alain Sorurian  
+**Author**: Alain S. 
 **Project Type**: Consumer Credit Risk Modeling  
 **Dataset**: LendingClub Loan Data (2016–2020)
 
