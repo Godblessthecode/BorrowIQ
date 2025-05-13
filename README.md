@@ -4,16 +4,16 @@
 **Project Type**: Consumer Credit Risk Modeling  
 **Dataset**: LendingClub Loan Data (2016–2020)
 
-## 🚀 Project Overview
+## Project Overview
 BorrowIQ is a machine learning project that predicts loan default probability using consumer loan data. It combines financial domain expertise with data science techniques and delivers insights through an interactive Streamlit dashboard.
 
-## 🔍 Objectives
+## Objectives
 - Predict loan default using borrower features
 - Demonstrate data preprocessing, modeling, and evaluation
 - Build an interactive dashboard for loan scoring
 - Showcase skills in Python, Scikit-learn, XGBoost, and Streamlit
 
-## 📦 Features
+## Features
 - Data cleaning and preprocessing pipeline
 - Exploratory Data Analysis (EDA)
 - Logistic Regression and XGBoost models
@@ -21,7 +21,7 @@ BorrowIQ is a machine learning project that predicts loan default probability us
 - Feature importance and explainability (SHAP)
 - Streamlit app for real-time loan scoring
 
-## 🧰 Tech Stack
+## Tech Stack
 - Python (Pandas, NumPy, Scikit-learn, XGBoost, SHAP)
 - Streamlit
 - Git & GitHub
@@ -39,8 +39,8 @@ borrowiq-default-predictor/
 ├── project_todo.md      # Project planning and task checklist
 ```
 
-## 📊 Dashboard Preview
+## Dashboard Preview
 > A screenshot or Streamlit Cloud link will be added here upon deployment.
 
-## 📜 License
+## License
 MIT License
