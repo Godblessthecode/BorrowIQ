@@ -30,13 +30,16 @@ BorrowIQ is a machine learning project that predicts loan default probability us
 ## 📁 Repository Structure
 ```
 borrowiq-default-predictor/
-├── data/                # Scripts or instructions to get LendingClub data
-├── notebooks/           # Jupyter notebooks for EDA and modeling
-├── src/                 # Python scripts (preprocessing, modeling, utils)
-├── dashboard/           # Streamlit app and dashboard components
-├── README.md            # Project overview and setup instructions
-├── requirements.txt     # List of dependencies
-├── project_todo.md      # Project planning and task checklist
+├── data/
+│   └── raw/                 # CSV lives here (add to .gitignore)
+├── src/
+│   └── preview_data.py      
+├── notebooks/               
+├── .gitignore               
+├── README.md                
+├── requirements.txt         
+└── LICENSE                   MIT license
+
 ```
 
 ## Dashboard Preview
