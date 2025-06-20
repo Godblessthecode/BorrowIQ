@@ -3,7 +3,7 @@
 **Author**: Alain Sorurian  
 **Status**: In Progress — building in public  
 **Project Type**: Applied Machine Learning | Credit Risk  
-**Dataset**: LendingClub Loan Data (2016–2020)
+**Dataset**: LendingClub Loan Data (2016–2018)
 
 ---
 
