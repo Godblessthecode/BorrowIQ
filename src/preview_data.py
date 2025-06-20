@@ -1,47 +1,43 @@
-<<<<<<< HEAD
 # src/preview_data.py
 
+import os
 import pandas as pd
-import sys
+import argparse
 
 def main():
-    # Define file path (raw string avoids Windows escape errors)
-    file_path = r'C:\Users\Alain\OneDrive\Desktop\Alain\Code Projects\borrowiq\data\raw\accepted_2007_to_2018q4.csv\accepted_2007_to_2018Q4.csv'
+    # Set up CLI argument parser
+    parser = argparse.ArgumentParser(description="Preview LendingClub loan data.")
+    parser.add_argument(
+        "--path",
+        type=str,
+        default=os.path.join("data", "raw", "accepted_2007_to_2018Q4.csv"),
+        help="Path to the raw CSV file (default: data/raw/accepted_2007_to_2018Q4.csv)"
+    )
+    args = parser.parse_args()
+    file_path = args.path
 
     try:
-        print("📥 Loading CSV file...")
+        print(f"📥 Loading CSV file from: {file_path}")
         df = pd.read_csv(file_path, low_memory=False)
         print("✅ File loaded successfully.\n")
 
-        # Show shape
         print(f"🧮 Shape of dataset: {df.shape}")
-
-        # Show column names
         print("\n📋 Column names:")
         print(df.columns.tolist())
-
-        # Show first few rows
         print("\n🔍 Preview of first rows:")
         print(df.head())
-
-        # Show column data types and null counts
         print("\n🧾 Data info:")
-        print(df.info())
-
-        # Show missing values
+        df.info()
         print("\n⚠️ Top 20 columns with missing values:")
         missing = df.isnull().sum().sort_values(ascending=False)
         print(missing[missing > 0].head(20))
 
     except FileNotFoundError:
-        print("❌ File not found. Double-check the path.")
+        print("❌ File not found. Double-check the path or use --path to specify.")
     except PermissionError:
-        print("❌ Permission denied. Make sure the file isn’t open in Excel or locked by OneDrive.")
+        print("❌ Permission denied. Is the file open in Excel or locked?")
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
 
 if __name__ == "__main__":
     main()
-=======
->>>>>>> d3d8cccdc4558fa9ef4323f107661031200c7a6e
-
