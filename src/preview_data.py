@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # src/preview_data.py
 
 import pandas as pd
@@ -41,4 +42,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+=======
+>>>>>>> d3d8cccdc4558fa9ef4323f107661031200c7a6e
 
