@@ -4,7 +4,7 @@ import argparse
 import pandas as pd
 from pathlib import Path
 
-def preprocess(input_path, output_path):
+def preprocess(input_path, output_path, drop_leakage=False):
     # 🧭 Load raw data
     input_path = Path(input_path)
     assert input_path.exists(), f"❌ File not found: {input_path}"
@@ -22,19 +22,23 @@ def preprocess(input_path, output_path):
     threshold = len(df) * 0.8
     df = df.dropna(thresh=threshold, axis=1)
 
-    # 🔐 Step 4: Drop leakage columns
+    # 🔐 Step 4 (optional): Drop leakage columns
     leakage_cols = [
         'id', 'funded_amnt_inv', 'installment', 'total_pymnt', 'recoveries',
         'last_pymnt_d', 'last_credit_pull_d', 'collection_recovery_fee',
         'out_prncp', 'total_rec_prncp', 'total_rec_int', 'total_rec_late_fee',
         'last_pymnt_amnt', 'total_pymnt_inv', 'last_fico_range_high', 'last_fico_range_low'
     ]
-    df = df.drop(columns=[col for col in leakage_cols if col in df.columns])
+    if drop_leakage:
+        dropped = [col for col in leakage_cols if col in df.columns]
+        df = df.drop(columns=dropped)
+        print(f"🛑 Dropped {len(dropped)} leakage columns: {dropped}")
+    else:
+        print("⚠️ Skipping leakage column removal (use --drop-leakage to enable)")
 
     # 🛠 Step 5: Fill missing values
     for col in df.select_dtypes(include='number').columns:
         df[col] = df[col].fillna(df[col].median())
-
     for col in df.select_dtypes(include='object').columns:
         df[col] = df[col].fillna('Unknown')
 
@@ -61,8 +65,13 @@ def main():
         default="data/processed/borrowiq_cleaned.csv",
         help="Path to save the processed CSV file"
     )
+    parser.add_argument(
+        "--drop-leakage",
+        action="store_true",
+        help="If set, drops potential leakage columns"
+    )
     args = parser.parse_args()
-    preprocess(args.input, args.output)
+    preprocess(args.input, args.output, args.drop_leakage)
 
 if __name__ == "__main__":
     main()
