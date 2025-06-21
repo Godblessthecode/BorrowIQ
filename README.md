@@ -9,16 +9,11 @@
 
 ## 📌 Project Goal
 
-BorrowIQ is an end-to-end credit risk modeling system designed to predict loan default probabilities at origination using historical consumer loan data. The project brings together:
-
-- Financial domain expertise 
-- Machine learning techniques (Logistic Regression, XGBoost, Decision Tree)
-- Model explainability (SHAP values)
-- Real-time scoring through a Streamlit dashboard *(planned)*
+BorrowIQ is a credit risk modeling pipeline that estimates the probability of default (PD) at **loan origination** using historical LendingClub data. The system is built to reflect realistic underwriting conditions — using only features that would have been known at the time of loan approval.
 
 ---
 
-## ✅ Completed So Far
+## ✅ Completed Components
 
 ### 🔍 1. Data Preview Script
 
@@ -28,62 +23,96 @@ BorrowIQ is an end-to-end credit risk modeling system designed to predict loan d
 python src/preview_data.py
 ```
 
-**What it does:**
-- Loads the raw LendingClub dataset (`accepted_2007_to_2018Q4.csv`)
-- Shows shape, columns, nulls, and a basic data profile
-- Flags potential leakage columns based on keyword heuristics
+**Functionality:**
 
-**Note**: Dataset must be placed in `data/raw/`. The `.gitignore` ensures raw data stays local.
+- Loads raw dataset (`accepted_2007_to_2018Q4.csv`)
+- Prints shape, columns, and missing values
+- Highlights top 20 features with missing data
+- Flags potential **leakage columns** using simple keyword heuristics  
+  (e.g. `pymnt`, `rec`, `recover`, `last_`, etc.)
+
+**Limitations:**
+
+- Leakage detection is based on column name matching  
+  → It will not detect structural or proxy leakage
+
+> 📁 **Note**: Dataset must be placed in `data/raw/`. Raw files are `.gitignored`.
 
 ---
 
-### 🧹 2. Data Preprocessing
+### 🧹 2. Data Preprocessing Script
 
 📄 `src/00_preprocess_borrowiq.py`
 
 ```bash
-python src/00_preprocess_borrowiq.py --drop-leakage
+python src/00_preprocess_borrowiq.py
 ```
 
 **What it does:**
 
-- Keeps only `Fully Paid` and `Charged Off` loans
-- Binarizes target: 0 = paid, 1 = default
-- Filters loans from 2016 onward
-  - *Note: LendingClub changed field definitions significantly after 2016; filtering ensures consistency.*
-- Drops columns with >80% missing
-- Removes leakage columns (only if `--drop-leakage` is passed)
-- Imputes missing numeric/categorical values
-- Saves output to `data/processed/borrowiq_cleaned.csv`
+- Filters data to `Fully Paid` and `Charged Off` loans only
+- Converts target: `Fully Paid` → `0`, `Charged Off` → `1`
+- Keeps loans **issued from 2016 onward**  
+  *(Note: LendingClub schema stabilized in 2016)*
+- Drops columns with **>80% missing values**
+- **Always removes known leakage columns** (e.g. `total_pymnt`, `recoveries`, `last_pymnt_d`, etc.)
+- Fills missing values:
+  - Numeric columns → median
+  - Object columns → `'Unknown'`
+- Saves output to: `data/processed/borrowiq_cleaned.csv`
+
+
+
+## ⚠️ Known Caveats
+
+- Imputation is applied **before train-test split** — not recommended for production modeling
+- Keyword-based leakage checks **miss proxy features** like `int_rate`, `grade`, or `fico_range`
+- No outlier treatment or feature scaling yet
 
 ---
 
-## 🔨 Up Next (Live)
+## 🧪 Sample Usage
 
-- `02_feature_engineering_borrowiq.py`: binning, scaling, winsorization  
-- `01_eda_borrowiq.ipynb`: visual patterns, default heatmaps, variable exploration  
-- GitHub Actions test automation for notebook execution  
-- Deploying a lightweight Streamlit prototype
+### Preview raw data:
+
+```bash
+python src/preview_data.py --path data/raw/accepted_2007_to_2018Q4.csv
+```
+
+### Run preprocessing (leakage dropped by default):
+
+```bash
+python src/00_preprocess_borrowiq.py
+```
 
 ---
 
-## 📁 Folder Structure (Live Snapshot)
+## 📁 Folder Structure
 
 ```
 borrowiq-default-predictor/
 ├── data/
-│   ├── raw/                    # Ignored raw LendingClub data
-│   └── processed/              # Cleaned data output
+│   ├── raw/                      # Raw LendingClub data (.gitignored)
+│   └── processed/                # Cleaned dataset outputs
 ├── src/
-│   ├── preview_data.py         # CSV inspection tool
-│   └── 00_preprocess_borrowiq.py  # Cleaning + filtering logic
-├── .gitignore                  # Raw data excluded
-├── README.md                   # This file
-├── requirements.txt            # Will be updated progressively
+│   ├── preview_data.py           # Raw data inspection tool
+│   └── 00_preprocess_borrowiq.py # Cleaning pipeline
+├── .gitignore
+├── README.md
+├── requirements.txt
 ```
+
+---
+
+## 🔜 Roadmap
+
+- `02_feature_engineering_borrowiq.py` (binning, scaling, encoding)
+- `01_eda_borrowiq.ipynb` (EDA visualizations, SHAP planning)
+- Streamlit scoring interface
+- GitHub Actions for CI/CD
 
 ---
 
 ## 🪪 License
 
-MIT License — fork freely and improve collaboratively.
+MIT License — use, fork, and adapt freely.
