@@ -4,7 +4,7 @@ import argparse
 import pandas as pd
 from pathlib import Path
 
-def preprocess(input_path, output_path, drop_leakage=False):
+def preprocess(input_path, output_path):
     # 🧭 Load raw data
     input_path = Path(input_path)
     assert input_path.exists(), f"❌ File not found: {input_path}"
@@ -38,19 +38,16 @@ def preprocess(input_path, output_path, drop_leakage=False):
     df = df.drop(columns=dropped_cols)
     print(f"🧹 Dropped {len(dropped_cols)} columns with >80% missing: {dropped_cols}")
 
-    # 🔐 Step 4: Drop leakage columns
+    # 🔐 Step 4: Always drop known leakage columns
     leakage_cols = [
         'id', 'funded_amnt_inv', 'installment', 'total_pymnt', 'recoveries',
         'last_pymnt_d', 'last_credit_pull_d', 'collection_recovery_fee',
         'out_prncp', 'total_rec_prncp', 'total_rec_int', 'total_rec_late_fee',
         'last_pymnt_amnt', 'total_pymnt_inv', 'last_fico_range_high', 'last_fico_range_low'
     ]
-    if drop_leakage:
-        dropped = [col for col in leakage_cols if col in df.columns]
-        df = df.drop(columns=dropped)
-        print(f"🛑 Dropped {len(dropped)} leakage columns: {dropped}")
-    else:
-        print("⚠️ Skipping leakage column removal (use --drop-leakage to enable)")
+    dropped = [col for col in leakage_cols if col in df.columns]
+    df = df.drop(columns=dropped)
+    print(f"🛑 Dropped {len(dropped)} leakage columns: {dropped}")
 
     # 🛠 Step 5: Fill missing values
     for col in df.select_dtypes(include='number').columns:
@@ -85,13 +82,8 @@ def main():
         default="data/processed/borrowiq_cleaned.csv",
         help="Path to save the processed CSV file"
     )
-    parser.add_argument(
-        "--drop-leakage",
-        action="store_true",
-        help="If set, drops potential leakage columns"
-    )
     args = parser.parse_args()
-    preprocess(args.input, args.output, args.drop_leakage)
+    preprocess(args.input, args.output)
 
 if __name__ == "__main__":
     main()
