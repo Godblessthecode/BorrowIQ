@@ -24,13 +24,33 @@ def main():
         print(f"🧮 Shape of dataset: {df.shape}")
         print("\n📋 Column names:")
         print(df.columns.tolist())
+
         print("\n🔍 Preview of first rows:")
         print(df.head())
+
         print("\n🧾 Data info:")
         df.info()
+
         print("\n⚠️ Top 20 columns with missing values:")
         missing = df.isnull().sum().sort_values(ascending=False)
         print(missing[missing > 0].head(20))
+
+        # 🔐 Check for potential data leakage columns
+        print("\n🛑 Potential data leakage columns (based on keywords):")
+        leakage_keywords = [
+            'pymnt', 'rec', 'recover', 'settlement', 'hardship',
+            'last_', 'next_', 'out_prncp', 'total_pymnt', 'collection',
+            'debt_settlement', 'fico_range', 'id', 'url', 'desc'
+        ]
+
+        leakage_candidates = [col for col in df.columns
+                              if any(kw in col.lower() for kw in leakage_keywords)]
+
+        if leakage_candidates:
+            for col in leakage_candidates:
+                print(f" - {col}")
+        else:
+            print("✅ No obvious leakage columns detected based on keywords.")
 
     except FileNotFoundError:
         print("❌ File not found. Double-check the path or use --path to specify.")
