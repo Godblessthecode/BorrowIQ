@@ -14,7 +14,7 @@ BorrowIQ is an end-to-end credit risk modeling system designed to predict loan d
 - Financial domain expertise 
 - Machine learning techniques (Logistic Regression, XGBoost, Decision Tree)
 - Model explainability (SHAP values)
-- Real-time scoring through a Streamlit dashboard
+- Real-time scoring through a Streamlit dashboard *(planned)*
 
 ---
 
@@ -31,6 +31,7 @@ python src/preview_data.py
 **What it does:**
 - Loads the raw LendingClub dataset (`accepted_2007_to_2018Q4.csv`)
 - Shows shape, columns, nulls, and a basic data profile
+- Flags potential leakage columns based on keyword heuristics
 
 **Note**: Dataset must be placed in `data/raw/`. The `.gitignore` ensures raw data stays local.
 
@@ -41,7 +42,7 @@ python src/preview_data.py
 📄 `src/00_preprocess_borrowiq.py`
 
 ```bash
-python src/00_preprocess_borrowiq.py
+python src/00_preprocess_borrowiq.py --drop-leakage
 ```
 
 **What it does:**
@@ -49,8 +50,9 @@ python src/00_preprocess_borrowiq.py
 - Keeps only `Fully Paid` and `Charged Off` loans
 - Binarizes target: 0 = paid, 1 = default
 - Filters loans from 2016 onward
+  - *Note: LendingClub changed field definitions significantly after 2016; filtering ensures consistency.*
 - Drops columns with >80% missing
-- Removes leakage columns
+- Removes leakage columns (only if `--drop-leakage` is passed)
 - Imputes missing numeric/categorical values
 - Saves output to `data/processed/borrowiq_cleaned.csv`
 
@@ -85,4 +87,3 @@ borrowiq-default-predictor/
 ## 🪪 License
 
 MIT License — fork freely and improve collaboratively.
-
