@@ -10,6 +10,21 @@ def preprocess(input_path, output_path, drop_leakage=False):
     assert input_path.exists(), f"❌ File not found: {input_path}"
     df = pd.read_csv(input_path, low_memory=False)
 
+    # 📊 Step 0: Feature summary before any preprocessing
+    def generate_feature_summary(df):
+        summary = pd.DataFrame({
+            "dtype": df.dtypes,
+            "num_missing": df.isnull().sum(),
+            "pct_missing": df.isnull().mean() * 100,
+            "num_unique": df.nunique(),
+            "sample_values": df.apply(lambda x: x.dropna().unique()[:5])
+        })
+        return summary.sort_values(by="pct_missing", ascending=False)
+
+    summary = generate_feature_summary(df)
+    print("📋 Feature summary (pre-cleaning):")
+    print(summary.head(30))  # Or export to CSV for deeper review
+
     # 🎯 Step 1: Binary target
     df = df[df['loan_status'].isin(['Fully Paid', 'Charged Off'])]
     df['loan_status'] = df['loan_status'].map({'Fully Paid': 0, 'Charged Off': 1})
@@ -19,10 +34,11 @@ def preprocess(input_path, output_path, drop_leakage=False):
     df = df[df['issue_d'].dt.year >= 2016]
 
     # 🧹 Step 3: Drop columns with >80% missing
-    threshold = len(df) * 0.8
-    df = df.dropna(thresh=threshold, axis=1)
+    dropped_cols = df.columns[df.isnull().mean() > 0.8].tolist()
+    df = df.drop(columns=dropped_cols)
+    print(f"🧹 Dropped {len(dropped_cols)} columns with >80% missing: {dropped_cols}")
 
-    # 🔐 Step 4 (optional): Drop leakage columns
+    # 🔐 Step 4: Drop leakage columns
     leakage_cols = [
         'id', 'funded_amnt_inv', 'installment', 'total_pymnt', 'recoveries',
         'last_pymnt_d', 'last_credit_pull_d', 'collection_recovery_fee',
@@ -41,6 +57,10 @@ def preprocess(input_path, output_path, drop_leakage=False):
         df[col] = df[col].fillna(df[col].median())
     for col in df.select_dtypes(include='object').columns:
         df[col] = df[col].fillna('Unknown')
+
+    # 🧮 Report number of filled columns
+    num_filled = df.isnull().sum().gt(0).sum()
+    print(f"🔧 Filled missing values in {num_filled} columns.")
 
     # 💾 Step 6: Save cleaned data
     output_path = Path(output_path)
