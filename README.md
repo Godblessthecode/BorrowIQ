@@ -61,7 +61,28 @@ python src/00_preprocess_borrowiq.py
   - Object columns → `'Unknown'`
 - Saves output to: `data/processed/borrowiq_cleaned.csv`
 
+---
 
+### 🧠 3. Feature Engineering Script
+
+📄 `src/02_feature_engineering_borrowiq.py`
+
+```bash
+python src/02_feature_engineering_borrowiq.py
+```
+
+**What it adds:**
+
+- ✅ Winsorization of `annual_inc` and `dti` at the 99th percentile
+- 🔁 Log-transform of the winsorized income
+- 📈 Binned income and interest rates into quartiles and terciles
+- 🧠 Feature interaction: `int_rate_grade` = `grade` × `int_rate_bin`
+- 🔍 Purpose grouping for low-frequency classes into `other_low_volume`
+- 📋 Feature summary table printed to console
+
+> Output is saved to: `data/processed/borrowiq_cleaned.csv` (overwritten)
+
+---
 
 ## ⚠️ Known Caveats
 
@@ -85,6 +106,12 @@ python src/preview_data.py --path data/raw/accepted_2007_to_2018Q4.csv
 python src/00_preprocess_borrowiq.py
 ```
 
+### Run feature engineering:
+
+```bash
+python src/02_feature_engineering_borrowiq.py
+```
+
 ---
 
 ## 📁 Folder Structure
@@ -95,8 +122,9 @@ borrowiq-default-predictor/
 │   ├── raw/                      # Raw LendingClub data (.gitignored)
 │   └── processed/                # Cleaned dataset outputs
 ├── src/
-│   ├── preview_data.py           # Raw data inspection tool
-│   └── 00_preprocess_borrowiq.py # Cleaning pipeline
+│   ├── preview_data.py
+│   ├── 00_preprocess_borrowiq.py
+│   └── 02_feature_engineering_borrowiq.py
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
@@ -106,8 +134,8 @@ borrowiq-default-predictor/
 
 ## 🔜 Roadmap
 
-- `02_feature_engineering_borrowiq.py` (binning, scaling, encoding)
 - `01_eda_borrowiq.ipynb` (EDA visualizations, SHAP planning)
+- Modeling script and metrics
 - Streamlit scoring interface
 - GitHub Actions for CI/CD
 
