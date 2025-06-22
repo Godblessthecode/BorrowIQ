@@ -84,6 +84,30 @@ python src/02_feature_engineering_borrowiq.py
 
 ---
 
+### 🤖 4. Model Training Script
+
+📄 `src/model_train.py`
+
+```bash
+python src/model_train.py --data data/processed/borrowiq_cleaned.csv
+```
+
+**What it does:**
+
+- Loads the cleaned, feature-engineered dataset
+- Drops high-cardinality and noisy columns (e.g. `emp_title`, `sub_grade`, `zip_code`, etc.)
+- Encodes a predefined list of safe categorical variables
+- Ensures all features are numeric to avoid model errors
+- Splits into train/test sets with stratification
+- Trains a `RandomForestClassifier` (by default)
+- Prints:
+  - 📊 Classification Report
+  - 🎯 ROC AUC Score
+
+> 💡 Script is modular and CLI-ready — easy to swap models, export outputs, or plug into future pipelines.
+
+---
+
 ## ⚠️ Known Caveats
 
 - Imputation is applied **before train-test split** — not recommended for production modeling
@@ -112,6 +136,12 @@ python src/00_preprocess_borrowiq.py
 python src/02_feature_engineering_borrowiq.py
 ```
 
+### Train baseline model:
+
+```bash
+python src/model_train.py --data data/processed/borrowiq_cleaned.csv
+```
+
 ---
 
 ## 📁 Folder Structure
@@ -124,7 +154,8 @@ borrowiq-default-predictor/
 ├── src/
 │   ├── preview_data.py
 │   ├── 00_preprocess_borrowiq.py
-│   └── 02_feature_engineering_borrowiq.py
+│   ├── 02_feature_engineering_borrowiq.py
+│   └── model_train.py
 ├── .gitignore
 ├── README.md
 ├── requirements.txt
@@ -135,7 +166,7 @@ borrowiq-default-predictor/
 ## 🔜 Roadmap
 
 - `01_eda_borrowiq.ipynb` (EDA visualizations, SHAP planning)
-- Modeling script and metrics
+- Additional model experimentation + export
 - Streamlit scoring interface
 - GitHub Actions for CI/CD
 
