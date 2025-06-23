@@ -1,6 +1,13 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report, roc_auc_score
+import argparse
+import joblib
+import os
+
+from xgboost import XGBClassifier  # 👈 Replacing RandomForest
+import warnings
+warnings.filterwarnings("ignore")
 
 
 def load_data(path):
@@ -28,7 +35,6 @@ def preprocess_features(df, target='loan_status'):
     df_encoded = pd.get_dummies(df, columns=existing_categoricals, drop_first=True)
     print(f"🔄 Encoded {len(existing_categoricals)} categorical columns — resulting shape: {df_encoded.shape}")
 
-    # Drop any remaining object-type columns that slipped through
     non_numeric = df_encoded.select_dtypes(include=['object', 'category']).columns.tolist()
     if non_numeric:
         print(f"⚠️ Dropping remaining non-numeric columns: {non_numeric}")
@@ -44,16 +50,24 @@ def split_data(X, y, test_size=0.2, random_state=42):
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
-
-    # Align columns in train and test sets to avoid shape mismatch
     X_train, X_test = X_train.align(X_test, join='left', axis=1, fill_value=0)
     print(f"✅ Data split — Train: {X_train.shape}, Test: {X_test.shape}")
-
     return X_train, X_test, y_train, y_test
 
 
-def train_model(model, X_train, y_train):
-    """Fit the model on training data."""
+def train_model(X_train, y_train):
+    """Train an XGBoost classifier with sensible defaults."""
+    model = XGBClassifier(
+        n_estimators=200,
+        max_depth=5,
+        learning_rate=0.1,
+        use_label_encoder=False,
+        eval_metric='logloss',
+        scale_pos_weight=3,  # 👈 account for class imbalance
+        n_jobs=-1,
+        random_state=42
+    )
+    print("⏳ Training XGBoost Classifier...")
     model.fit(X_train, y_train)
     print(f"✅ Trained {model.__class__.__name__}")
     return model
@@ -62,33 +76,28 @@ def train_model(model, X_train, y_train):
 def evaluate_model(model, X_test, y_test):
     """Evaluate model performance on test set."""
     y_pred = model.predict(X_test)
-    y_proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else None
+    y_proba = model.predict_proba(X_test)[:, 1]
 
     print("\n📊 Classification Report:")
     print(classification_report(y_test, y_pred))
 
-    if y_proba is not None:
-        roc = roc_auc_score(y_test, y_proba)
-        print(f"🎯 ROC AUC: {roc:.4f}")
-    else:
-        print("⚠️ Model does not support probability predictions.")
+    roc = roc_auc_score(y_test, y_proba)
+    print(f"🎯 ROC AUC: {roc:.4f}")
 
 
-# Optional: CLI entry point for script usage
 if __name__ == '__main__':
-    import argparse
-    from sklearn.ensemble import RandomForestClassifier
-
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, default='data/processed/borrowiq_cleaned.csv')
+    parser.add_argument('--data', type=str, default='data/processed/borrowiq_final_model_ready.csv')
+    parser.add_argument('--output_model', type=str, default='models/xgboost_model.pkl')
     args = parser.parse_args()
 
     df = load_data(args.data)
     X, y = preprocess_features(df)
     X_train, X_test, y_train, y_test = split_data(X, y)
 
-    model = RandomForestClassifier(random_state=42)
-    model = train_model(model, X_train, y_train)
+    model = train_model(X_train, y_train)
     evaluate_model(model, X_test, y_test)
-# This code is designed to train a machine learning model on the processed BorrowIQ dataset.
-   
+
+    os.makedirs(os.path.dirname(args.output_model), exist_ok=True)
+    joblib.dump(model, args.output_model)
+    print(f"📂 Model saved to {args.output_model}")
