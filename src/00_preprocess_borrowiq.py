@@ -39,7 +39,7 @@ def drop_leakage_columns(df):
         'id', 'funded_amnt_inv', 'installment', 'total_pymnt', 'recoveries',
         'last_pymnt_d', 'last_credit_pull_d', 'collection_recovery_fee',
         'out_prncp', 'total_rec_prncp', 'total_rec_int', 'total_rec_late_fee',
-        'last_pymnt_amnt', 'total_pymnt_inv', 'last_fico_range_high', 'last_fico_range_low'
+        'last_pymnt_amnt', 'total_pymnt_inv', 'last_fico_range_high', 'last_fico_range_low','debt_settlement_flag' 
     ]
     existing_leakage = [col for col in leakage_cols if col in df.columns]
     df = df.drop(columns=existing_leakage)
