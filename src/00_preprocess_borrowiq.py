@@ -24,7 +24,22 @@ def filter_and_encode_target(df):
 # --- Step 2: Filter by issue date
 def filter_by_issue_date(df, year_threshold=2016):
     df['issue_d'] = pd.to_datetime(df['issue_d'], format='%b-%Y', errors='coerce')
-    return df[df['issue_d'].dt.year >= year_threshold]
+    df = df[df['issue_d'].dt.year >= year_threshold]
+
+    print("\n📆 Issue year distribution (post-filter):")
+    print(df['issue_d'].dt.year.value_counts().sort_index())
+
+    # --- Class balance check
+    class_dist = df['loan_status'].value_counts(normalize=True)
+    print("\n📊 Class balance (post-filter):")
+    print(class_dist)
+
+    if 1 in class_dist and class_dist[1] < 0.15:
+        print(f"⚠️ Warning: Only {class_dist[1]*100:.2f}% of loans are 'Charged Off' after {year_threshold}. Consider class balancing techniques.")
+    elif 1 not in class_dist:
+        print(f"❌ No 'Charged Off' loans remaining after year filter. Check issue_d and target encoding.")
+
+    return df
 
 # --- Step 3: Drop high-missing columns
 def drop_high_missing(df, threshold=0.8):
