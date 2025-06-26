@@ -82,10 +82,15 @@ def main():
     df = bin_interest_rate(df)
     df = group_rare_purposes(df)
 
+    # Drop raw features now that engineered versions are created
+    for col in ['dti', 'annual_inc']:
+        if col in df.columns:
+            df.drop(columns=col, inplace=True)
+
     print("\n🔎 Feature Engineering Preview:")
     print(df[[
-        'annual_inc', 'annual_inc_winsorized', 'annual_inc_winsorized_log',
-        'dti', 'dti_winsorized', 'income_bin', 'int_rate', 'int_rate_bin', 'int_rate_grade', 'purpose', 'purpose_grouped']].head())
+        'annual_inc_winsorized', 'annual_inc_winsorized_log',
+        'dti_winsorized', 'income_bin', 'int_rate', 'int_rate_bin', 'int_rate_grade', 'purpose_grouped']].head())
 
     print("\n📋 Feature Summary Table:")
     print(feature_summary())
