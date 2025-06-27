@@ -8,7 +8,7 @@ from pathlib import Path
 root_dir = Path(__file__).resolve().parents[1]  # Adjusted for script in borrowiq/src
 
 data_path = root_dir / "data" / "processed" / "borrowiq_cleaned.csv"
-output_path = root_dir / "data" / "processed" / "borrowiq_cleaned.csv"  # Final output path
+output_path = root_dir / "data" / "processed" / "borrowiq_final_model_ready.csv"  # Final output path
 
 # ===============================
 # Feature Engineering Functions
